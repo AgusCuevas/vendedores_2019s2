@@ -1,0 +1,97 @@
+import Vendedores.*
+import Geografia.*
+import Clientes.*
+import CentrosDeDistribucion.*
+
+describe "test" {
+	
+	const buenosAires = new Provincias(poblacion =  2890151 )
+	const cordoba = new Provincias(poblacion = 1430000)
+	const entreRios = new Provincias(poblacion = 1235994)
+	const santaFe = new Provincias(poblacion = 490171)
+	const corrientes = new Provincias(poblacion = 346334)
+	const rioNegro = new Provincias(poblacion = 688873)
+	
+	const chivilcoy = new Ciudad(poblacion = 60300, provincia = buenosAires)
+	const zarate = new Ciudad(poblacion = 106100, provincia = buenosAires)
+	const rafaela = new Ciudad(poblacion = 19900, provincia = santaFe)
+	const diamante = new Ciudad(poblacion = 98500, provincia = entreRios)
+	const sanFrancisco = new Ciudad(poblacion = 108000, provincia = cordoba)
+	const ituzaingo = new Ciudad(poblacion = 100000, provincia = buenosAires)
+	const rosario = new Ciudad(poblacion = 100000, provincia = santaFe)
+	const bariloche = new Ciudad(poblacion = 100000, provincia = rioNegro)
+	
+	const certificacion1 = new Certificaciones(esDeProducto = true, puntaje = 10)
+	const certificacion2 = new Certificaciones(esDeProducto = false, puntaje = 5)
+	const certificacion3 = new Certificaciones(esDeProducto = true, puntaje = 20)
+	const certificacion4 = new Certificaciones(esDeProducto = false, puntaje = 15)
+	const certificacion5 = new Certificaciones(esDeProducto = true, puntaje = 25)
+	const certificacion6 = new Certificaciones(esDeProducto = false, puntaje = 10)
+	
+	
+	const vendedorFijo = new VendedorFijo(certificaciones = [certificacion1, certificacion4], ciudadDondeVive = ituzaingo)
+	const vendedorViajero = new Viajante(certificaciones = [certificacion4, certificacion5], provinciasDondeTrabaja = [buenosAires, santaFe, rioNegro])
+	const comercio = new ComercioCorresponsal(certificaciones = [certificacion5, certificacion1, certificacion3], ciudadesDeLasSucursales = [ituzaingo, chivilcoy, bariloche, diamante])
+	
+	const centro = new CentroDeDistribucion(ciudad = chivilcoy, vendedores = [vendedorFijo, vendedorViajero])
+
+test "vendedorFijo" {
+	
+		assert.equals(25, vendedorFijo.puntuacionDeCertificaciones())
+		assert.equals(false, vendedorFijo.esVersatil())
+		assert.equals(false, vendedorFijo.esFirme())
+		assert.equals(false, vendedorFijo.afinidadConElCentro(centro))
+		assert.equals(false, vendedorFijo.esCandidato(centro))
+		assert.equals(true, vendedorFijo.puedeTrabajar(ituzaingo))
+	}
+	
+test "vendedorViajante" {
+	
+		assert.equals(40, vendedorViajero.puntuacionDeCertificaciones())
+		assert.equals(false, vendedorViajero.esVersatil())
+		assert.equals(true, vendedorViajero.esFirme())
+		assert.equals(true, vendedorViajero.afinidadConElCentro(centro))
+		assert.equals(false, vendedorViajero.esCandidato(centro))
+		assert.equals(false, vendedorViajero.puedeTrabajar(diamante))
+		assert.equals(true, vendedorViajero.puedeTrabajar(rafaela))
+		assert.equals(false, vendedorViajero.esInfluyente())	
+	}
+	
+test "comercio" {
+	
+		assert.equals(55, comercio.puntuacionDeCertificaciones())
+		assert.equals(false, comercio.esVersatil())
+		assert.equals(true, comercio.esFirme())
+		assert.equals(true, comercio.afinidadConElCentro(centro))
+		assert.equals(false, comercio.esCandidato(centro))
+		assert.equals(false, comercio.puedeTrabajar(sanFrancisco))
+		assert.equals(false, comercio.esInfluyente())	
+	}
+	
+test "centroDeDistribucion"{
+		assert.equals(vendedorViajero, centro.vendedorEstrella())
+		assert.equals(false, centro.puedeCubrir(sanFrancisco))
+		assert.equals([vendedorFijo, vendedorViajero], centro.vendedorGenerico())
+		assert.equals(1, centro.esRobusto())
+		assert.equals(2, vendedorFijo.certificaciones().size())
+		assert.equals(2, vendedorViajero.certificaciones().size())
+		centro.entregarCertificacion(true, 10)
+		assert.equals(3, vendedorFijo.certificaciones().size())
+		assert.equals(3, vendedorViajero.certificaciones().size())
+	}
+	
+test "Clientes"{
+	assert.equals(false, clienteInseguro.puedeSerAtendidoPor(vendedorFijo))
+	assert.equals(false, clienteInseguro.puedeSerAtendidoPor(vendedorViajero))
+	assert.equals(false, clienteInseguro.puedeSerAtendidoPor(comercio))
+	
+	assert.equals(false, clienteDetallista.puedeSerAtendidoPor(vendedorFijo))
+	assert.equals(false, clienteDetallista.puedeSerAtendidoPor(vendedorViajero))
+	assert.equals(true, clienteDetallista.puedeSerAtendidoPor(comercio))
+	
+	assert.equals(true, clienteHumanista.puedeSerAtendidoPor(vendedorFijo))
+	assert.equals(true, clienteHumanista.puedeSerAtendidoPor(vendedorViajero))
+	assert.equals(false, clienteHumanista.puedeSerAtendidoPor(comercio))
+	}
+
+}
