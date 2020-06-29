@@ -15,7 +15,11 @@ class CentroDeDistribucion {
 	}
 	
 	method vendedorEstrella(){
-		return vendedores.max({ g => g.puntuacionDeCertificaciones()})
+		if (not vendedores.isEmpty()){
+			return vendedores.max({ g => g.puntuacionDeCertificaciones()})
+		}
+		else { throw new Exception(message = "No hay trabajadores") }
+		
 	}
 	
 	method puedeCubrir(unaCiudad){
